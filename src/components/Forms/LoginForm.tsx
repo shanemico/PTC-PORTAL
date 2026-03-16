@@ -1,71 +1,70 @@
 import { useState } from "react";
-import RegistrationForm from "./RegistrationForm";
+import { useNavigate } from "react-router-dom";
+import { authService } from "../../services/auth.service";
 
-export default function Login() {
+export default function LoginForm() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
+  const navigate = useNavigate();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (name === "admin" && password === "1234") {
-      setIsLoggedIn(true);
-    } else {
+    const user = authService.login(name, password); // ✅ using service now
+
+    if (!user) {
       alert("Invalid credentials");
+      return;
+    }
+
+    authService.saveSession(user); // ✅ save session
+
+    if (user.role === "admin") {
+      navigate("/admin/dashboard");
+    } else {
+      navigate("/student/dashboard");
     }
   }
 
   return (
-    <div className="auth-card">
-      {isLoggedIn ? (
-        <h1>Welcome {name} 🎉</h1>
-      ) : showRegister ? (
-        <RegistrationForm setShowRegister={setShowRegister} />
-      ) : (
-        <>
-          {/* LEFT PANEL */}
-          <div className="auth-left">
-            <h2>Welcome Back</h2>
-            <p>Login to access your portal dashboard.</p>
+    <>
+      <div className="auth-left">
+        <h2>Welcome Back</h2>
+        <p>Login to access your portal dashboard.</p>
+      </div>
+
+      <div className="auth-right">
+        <h2>Login</h2>
+
+        <form onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label>Username</label>
+            <input
+              type="text"
+              placeholder="Enter username"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
 
-          {/* RIGHT PANEL */}
-          <div className="auth-right">
-            <h2>Login</h2>
-
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="Username"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </form>
-            <button type="submit">Login</button>
-            <div className="auth-links">
-              <span></span>
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowRegister(true);
-                }}
-              >
-                Don't have an account?
-              </a>
-            </div>
+          <div className="input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
-        </>
-      )}
-    </div>
+
+          <button type="submit">Login</button>
+        </form>
+
+        <div className="auth-links">
+          <a href="/register">Create an account</a>
+          <a href="#">Forgot password?</a>
+        </div>
+      </div>
+    </>
   );
 }

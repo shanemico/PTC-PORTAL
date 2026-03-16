@@ -1,10 +1,20 @@
-import AdminLayout from "../../components/Layout/AdminLayout"
+import DashboardLayout from "../../components/Layout/DashboardLayout";
+import { authService } from "../../services/auth.service";
+import { useNavigate } from "react-router-dom";
 
-export default function Dashboard() {
+export default function AdminDashboard() {
+  const navigate = useNavigate();
+  const user = authService.getSession();
+
+  if (!user || user.role !== "admin") {
+    navigate("/login");
+    return null;
+  }
+
   return (
-    <AdminLayout>
-      <h3>Student Dashboard</h3>
-      <p>Welcome to your portal.</p>
-    </AdminLayout>
-  )
+    <DashboardLayout>
+      <h1>Welcome, {user.username} 👨‍💼</h1>
+      <p>This is your admin dashboard.</p>
+    </DashboardLayout>
+  );
 }

@@ -1,0 +1,42 @@
+import { NavLink } from "react-router-dom";
+import { authService } from "../../services/auth.service";
+
+const studentLinks = [
+  { label: "🏠 Dashboard", path: "/student/dashboard" },
+  { label: "📋 My Admission", path: "/student/admission" },
+  { label: "📢 Announcements", path: "/student/announcements" },
+  { label: "📁 My Records", path: "/student/records" },
+];
+
+const adminLinks = [
+  { label: "🏠 Dashboard", path: "/admin/dashboard" },
+  { label: "📋 Admissions", path: "/admin/admissions" },
+  { label: "👥 Students", path: "/admin/students" },
+  { label: "📢 Announcements", path: "/admin/announcements" },
+];
+
+export default function Sidebars() {
+  const user = authService.getSession();
+  const links = user?.role === "admin" ? adminLinks : studentLinks;
+
+  return (
+    <div className="sidebar">
+      <div className="sidebar-logo">
+        <h3>PTC</h3>
+      </div>
+      <nav className="sidebar-nav">
+        {links.map((link) => (
+          <NavLink
+            key={link.path}
+            to={link.path}
+            className={({ isActive }) =>
+              isActive ? "sidebar-link active" : "sidebar-link"
+            }
+          >
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
+    </div>
+  );
+}

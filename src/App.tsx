@@ -1,13 +1,14 @@
 import "./styles/App.css";
 import "./styles/auth.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Home from "./pages/auth/Index";
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/mainServer";
 
 function App() {
   return (
-    <div className="App">
-      <Home />
-    </div>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 

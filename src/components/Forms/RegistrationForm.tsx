@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
 type Props = {
-  setShowRegister: (value: boolean) => void;
+  onBackToLogin: () => void; // ✅ renamed from setShowRegister
 };
 
-export default function RegistrationForm({ setShowRegister }: Props) {
+export default function RegistrationForm({ onBackToLogin }: Props) {
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -34,62 +34,76 @@ export default function RegistrationForm({ setShowRegister }: Props) {
 
     setError("");
     console.log("Registering user...", formData);
+    // TODO: call authService.register() here later
+    onBackToLogin(); // go back to login after successful register
   }
 
   return (
     <>
-      {/* LEFT PANEL */}
       <div className="auth-left">
         <h2>Create Account</h2>
         <p>Join us today and start your journey with us!</p>
       </div>
 
-      {/* RIGHT PANEL */}
       <div className="auth-right">
         <h2>Register</h2>
 
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-          />
+          <div className="input-group">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@email.com"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
 
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-          />
+          <div className="input-group">
+            <label>Username</label>
+            <input
+              type="text"
+              name="username"
+              placeholder="Enter username"
+              value={formData.username}
+              onChange={handleChange}
+            />
+          </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-          />
+          <div className="input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
 
-          <input
-            type="password"
-            name="verifyPassword"
-            placeholder="Verify Password"
-            value={formData.verifyPassword}
-            onChange={handleChange}
-          />
+          <div className="input-group">
+            <label>Verify Password</label>
+            <input
+              type="password"
+              name="verifyPassword"
+              placeholder="••••••••"
+              value={formData.verifyPassword}
+              onChange={handleChange}
+            />
+          </div>
 
           {error && <div className="error-message">{error}</div>}
+
+          <button type="submit">Register</button>
         </form>
-        <button type="submit">Register</button>
+
         <div className="auth-links">
           <a
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              setShowRegister(false);
+              onBackToLogin();
             }}
           >
             Back to Login
