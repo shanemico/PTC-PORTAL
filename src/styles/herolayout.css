@@ -1,0 +1,242 @@
+/* ── Root ─────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.root {
+  font-family: "Georgia", "Times New Roman", serif;
+  min-height: 100vh;
+  background: #0a0404;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ──────────────────────────────────────── */
+.header {
+  height: 64px;
+  background: rgba(35, 168, 39, 0.96);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  gap: 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+}
+
+.logoMark {
+  width: 60px;
+  height: 100%;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0b1120;
+  font-weight: 700;
+  font-size: 17px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+.logoMark img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+.logoText {
+  color: #fff;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.nav {
+  display: flex;
+  gap: 4px;
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: "Helvetica Neue", sans-serif;
+  transition: color 0.2s;
+}
+
+.navLink:hover {
+  color: #fff;
+}
+
+.ctaGroup {
+  display: flex;
+  gap: 10px;
+}
+
+.btnLogin {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 7px 18px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: "Helvetica Neue", sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.btnLogin:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.btnAdmission {
+  background: linear-gradient(135deg, #c8973a, #e8c06a);
+  border: none;
+  color: #0b1120;
+  padding: 7px 20px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "Helvetica Neue", sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnAdmission:hover {
+  opacity: 0.88;
+}
+
+/* ── Main Layout ─────────────────────────────────── */
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 64px);
+}
+
+/* ── Left Panel ──────────────────────────────────── */
+.leftPanel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px 56px;
+  background: #192c0a;
+}
+
+.greeting {
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #e8c06a;
+  font-family: "Helvetica Neue", sans-serif;
+  margin-bottom: 20px;
+}
+
+.headline {
+  font-size: clamp(38px, 4vw, 62px);
+  color: #fff;
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  margin-bottom: 24px;
+}
+
+.headlineAccent {
+  font-style: italic;
+  color: #e8c06a;
+}
+
+.tagline {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.75;
+  font-family: "Helvetica Neue", sans-serif;
+  max-width: 380px;
+}
+
+/* ── Right Panel — Scroll Gallery ────────────────── */
+.rightPanel {
+  overflow-y: scroll;
+  height: calc(100vh - 64px);
+  scrollbar-width: none;
+  position: sticky;
+  top: 64px;
+}
+
+.rightPanel::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.galleryItem {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  position: relative;
+}
+
+.galleryItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.galleryItem:hover img {
+  transform: scale(1.04);
+}
+
+.galleryCaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 32px 24px 18px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, transparent 100%);
+  color: #fff;
+  font-size: 14px;
+  font-family: "Helvetica Neue", sans-serif;
+  letter-spacing: 0.3px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.galleryItem:hover .galleryCaption {
+  opacity: 1;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .rightPanel {
+    height: 60vh;
+    position: static;
+  }
+
+  .leftPanel {
+    padding: 48px 28px;
+  }
+
+  .nav {
+    display: none;
+  }
+}
