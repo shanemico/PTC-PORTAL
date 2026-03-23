@@ -1,7 +1,11 @@
 // Fake users for now - replace with real API call later
 const USERS = [
-  { username: "admin", password: "1234", role: "admin" as const },
-  { username: "student", password: "5678", role: "student" as const },
+  { username: "admin@ptc.edu.ph", password: "1234", role: "admin" as const },
+  {
+    username: "student@ptc.edu.ph",
+    password: "5678",
+    role: "student" as const,
+  },
 ];
 
 export type UserRole = "admin" | "student";
