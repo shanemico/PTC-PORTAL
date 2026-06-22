@@ -76,6 +76,53 @@ export default function LoginForm() {
           <a href="/register">Create an account</a>
           <a href="#">Forgot password?</a>
         </div>
+        <div style={{ marginTop: "20px" }}>
+          <h4>Development Access</h4>
+
+          <button
+            type="button"
+            onClick={() => {
+              authService.saveSession({
+                username: "admin",
+                role: "admin",
+              });
+
+              navigate("/admin/dashboard");
+            }}
+          >
+            Login as Admin
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              authService.saveSession({
+                username: "faculty",
+                role: "faculty",
+              });
+
+              navigate("/faculty/dashboard");
+            }}
+            style={{ marginLeft: "10px" }}
+          >
+            Login as Faculty
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              authService.saveSession({
+                username: "student",
+                role: "student",
+              });
+
+              navigate("/student/dashboard");
+            }}
+            style={{ marginLeft: "10px" }}
+          >
+            Login as Student
+          </button>
+        </div>
       </div>
     </div>
   );
