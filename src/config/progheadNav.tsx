@@ -4,7 +4,12 @@ export const programHeadSoloLinks = [
   {
     label: "Dashboard",
     path: "/programhead/dashboard",
-    icon: "🏠",
+    icon: "",
+  },
+  {
+    label: "Announcement",
+    path: "/programhead/announcementprog",
+    icon: "",
   },
 ];
 
@@ -17,6 +22,33 @@ export const programHeadNavGroups = [
       {
         label: "Pending Grades",
         path: "/programhead/gradeapproval/pending",
+      },
+      {
+        label: "Change Grade Requests",
+        path: "/programhead/grade-change-requests",
+      },
+      {
+        label: "Transfer Evaluations",
+        path: "/programhead/transfer-evaluations",
+      },
+    ],
+  },
+  {
+    id: "class-management",
+    label: "Class Management",
+    icon: "📋",
+    children: [
+      {
+        label: "Classes",
+        path: "/programhead/class/management",
+      },
+      {
+        label: "Faculty Schedules",
+        path: "/programhead/class/faculty-schedules",
+      },
+      {
+        label: "My Teaching Schedule",
+        path: "/programhead/class/schedule",
       },
     ],
   },

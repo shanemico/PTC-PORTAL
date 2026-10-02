@@ -1,217 +1,1122 @@
-/* ==========================
-   Manage Students
-========================== */
+/* =========================================================
+   ADMIN STUDENT MANAGEMENT
+   ADD / EDIT / DROP + CREATE / EDIT STUDENT
+   PTC Portal Admin Theme
 
-.admin-manage-students {
-  padding: 30px;
-  background: #f5f7fb;
-  min-height: 100vh;
+   IMPORTANT:
+   - Does NOT style .admin-manage-students as a page root.
+   - Student List remains isolated and untouched.
+   - Only shared inner class names are targeted beneath
+     the dedicated roots below.
+
+   Pages:
+   - Add / Edit / Drop Student
+   - Create Student
+   - Edit Student
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE ROOTS
+   ========================================================= */
+
+.admin-addeditdrop-students,
+.admin-createstudents-students,
+.admin-editstudents-students-table {
+  position: relative;
+
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+
+  margin: 0;
+
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  background: linear-gradient(
+    180deg,
+    #66c44f 0%,
+    #f4f5f1 100%
+  );
+
+  color: #1f2937;
+
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 8px 24px rgba(0, 0, 0, 0.05);
+
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-/* Header */
 
+/* =========================================================
+   PAGE HEADINGS
+   ========================================================= */
+
+.admin-addeditdrop-students
+.admin-manage-students__header h1,
+
+.admin-createstudents-students > h1,
+
+.admin-editstudents-students-table > h1 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  letter-spacing: -0.01em;
+}
+
+
+/* Create / Edit Student heading alignment */
+
+.admin-createstudents-students > h1,
+.admin-editstudents-students-table > h1 {
+  width: min(100%, 900px);
+
+  margin:
+    0 auto
+    20px;
+}
+
+
+/* =========================================================
+   ADD / EDIT / DROP HEADER
+   ========================================================= */
+
+.admin-addeditdrop-students
 .admin-manage-students__header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
   margin-bottom: 20px;
+
+  flex-wrap: wrap;
 }
 
-.admin-manage-students__header h1 {
-  font-size: 38px;
-  font-weight: 700;
-  color: #1b1b1b;
-  margin: 0;
-}
 
-/* Search */
+/* =========================================================
+   SEARCH
+   ========================================================= */
 
+.admin-addeditdrop-students
 .admin-manage-students__search {
-  width: 350px;
-  max-width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #d9d9d9;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  outline: none;
-  transition: 0.3s;
-  font-size: 15px;
-}
-
-.admin-manage-students__search:focus {
-  border-color: #0d6efd;
-  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
-}
-
-/* Table */
-
-.admin-manage-students__table {
   width: 100%;
-  border-collapse: collapse;
-  background: rgb(252, 252, 252);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-}
+  min-width: 0;
 
-.admin-manage-students__table thead {
-  background: #0d6efd;
-  color: white;
-}
+  height: 42px;
 
-.admin-manage-students__table th {
-  padding: 15px;
-  text-align: left;
-  font-size: 15px;
-  font-weight: 600;
-}
+  margin-bottom: 22px;
 
-.admin-manage-students__table td {
-  padding: 15px;
-  border-bottom: 1px solid #ececec;
+  padding:
+    0
+    14px
+    0
+    40px;
+
+  box-sizing: border-box;
+
+  background:
+    #f9fafb
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239ca3af' viewBox='0 0 16 16'><path d='M11.742 10.344a6.5 6.5 0 1 0-1.398 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/></svg>")
+    no-repeat
+    13px
+    center;
+
+  background-size: 15px 15px;
+
+  color: #1f2937;
+
+  border: 1.5px solid #cbd5e1;
+  border-radius: 9px;
+
+  outline: none;
+
+  font: inherit;
   font-size: 14px;
-  color: #444;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
-.admin-manage-students__table tbody tr {
-  transition: 0.25s;
+.admin-addeditdrop-students
+.admin-manage-students__search::placeholder {
+  color: #9ca3af;
 }
 
-.admin-manage-students__table tbody tr:hover {
-  background: #f8fbff;
+.admin-addeditdrop-students
+.admin-manage-students__search:hover {
+  border-color: #94a3b8;
 }
 
-/* Action buttons */
+.admin-addeditdrop-students
+.admin-manage-students__search:focus {
+  background-color: #ffffff;
 
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   ADD / EDIT / DROP TABLE
+   ========================================================= */
+
+.admin-addeditdrop-students
+.admin-manage-students__table {
+  display: table;
+
+  width: 100%;
+  min-width: 860px;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  background: #ffffff;
+
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 5px 14px rgba(15, 23, 42, 0.04);
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.admin-addeditdrop-students
+.admin-manage-students__table thead {
+  background: #f9fafb;
+}
+
+.admin-addeditdrop-students
+.admin-manage-students__table th {
+  padding: 13px 16px;
+
+  color: #6b7280;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-align: left;
+  text-transform: uppercase;
+
+  letter-spacing: 0.05em;
+
+  white-space: nowrap;
+
+  border-bottom: 1.5px solid #cbd5e1;
+  border-right: 1px solid #d7dde4;
+}
+
+.admin-addeditdrop-students
+.admin-manage-students__table th:last-child {
+  border-right: none;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.admin-addeditdrop-students
+.admin-manage-students__table td {
+  padding: 13px 16px;
+
+  color: #1f2937;
+
+  font-size: 13px;
+
+  line-height: 1.45;
+
+  vertical-align: middle;
+
+  border-bottom: 1px solid #d7dde4;
+  border-right: 1px solid #e2e7ec;
+}
+
+.admin-addeditdrop-students
 .admin-manage-students__table td:last-child {
+  border-right: none;
+
   white-space: nowrap;
 }
 
-.admin-manage-students__table .btn {
-  margin-right: 8px;
+.admin-addeditdrop-students
+.admin-manage-students__table tbody tr {
+  background: #ffffff;
+
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-/* ===================
-   Buttons
-=================== */
+.admin-addeditdrop-students
+.admin-manage-students__table tbody tr:nth-child(even) {
+  background: #fcfcfd;
+}
 
-.btn {
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
+.admin-addeditdrop-students
+.admin-manage-students__table tbody tr:hover {
+  background: #f5f7f9;
+}
+
+.admin-addeditdrop-students
+.admin-manage-students__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   TABLE EMPTY STATE
+   ========================================================= */
+
+.admin-addeditdrop-students
+.admin-manage-students__table td[colspan] {
+  padding: 42px 20px;
+
+  color: #6b7280;
+
+  text-align: center;
+
   font-size: 14px;
-  transition: 0.3s;
-  font-weight: 500;
+
+  background: #ffffff;
+
+  border-right: none;
 }
 
-.btn:hover {
-  transform: translateY(-2px);
-}
 
-.btn-primary {
-  background: #0d6efd;
-  color: white;
-}
+/* =========================================================
+   ERROR MESSAGES
+   ========================================================= */
 
-.btn-primary:hover {
-  background: #0b5ed7;
-}
+.admin-addeditdrop-students
+.admin-manage-students__error,
 
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-}
+.admin-createstudents-students
+.admin-manage-students__error,
 
-.btn-secondary:hover {
-  background: #5b636a;
-}
+.admin-editstudents-students-table
+.admin-manage-students__error {
+  display: block;
 
-.btn-danger {
-  background: #dc3545;
-  color: white;
-}
+  width: 100%;
 
-.btn-danger:hover {
-  background: #bb2d3b;
-}
+  margin:
+    0
+    0
+    16px;
 
-/* =====================
-   Modal Form
-====================== */
+  padding: 11px 14px;
 
-.admin-student-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  margin-top: 20px;
-}
+  box-sizing: border-box;
 
-.admin-student-form label {
-  display: flex;
-  flex-direction: column;
+  background: #fef2f2;
+
+  color: #b91c1c;
+
+  border: 1.5px solid #fca5a5;
+  border-radius: 8px;
+
+  font-size: 13px;
   font-weight: 600;
-  color: #0c0c0c;
-  font-size: 14px;
+
+  line-height: 1.5;
 }
 
-.admin-student-form input,
-.admin-student-form select {
-  margin-top: 6px;
-  padding: 12px;
-  border: 1px solid #d6d6d6;
+
+/* Create/Edit Student message alignment */
+
+.admin-createstudents-students
+.admin-manage-students__error,
+
+.admin-editstudents-students-table
+.admin-manage-students__error {
+  width: min(100%, 900px);
+
+  margin:
+    0 auto
+    16px;
+}
+
+
+/* =========================================================
+   SUCCESS MESSAGE
+   ========================================================= */
+
+.admin-createstudents-students
+.admin-success-box,
+
+.admin-editstudents-students-table
+.admin-success-box {
+  width: min(100%, 900px);
+
+  margin:
+    0 auto
+    16px;
+
+  padding: 11px 14px;
+
+  box-sizing: border-box;
+
+  background: #dcfce7;
+
+  color: #15803d;
+
+  border: 1.5px solid #86efac;
   border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  transition: 0.3s;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1.5;
 }
 
-.admin-student-form input:focus,
-.admin-student-form select:focus {
-  border-color: #0d6efd;
-  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+
+/* =========================================================
+   CREATE / EDIT STUDENT FORM
+   ========================================================= */
+
+.admin-createstudents-students
+.admin-student-form,
+
+.admin-editstudents-students-table
+.admin-student-form {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 16px 20px;
+
+  width: min(100%, 900px);
+  min-width: 0;
+
+  margin:
+    0 auto;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 6px 18px rgba(15, 23, 42, 0.04);
 }
 
-.admin-student-form__actions {
+
+/* =========================================================
+   FORM LABEL
+   ========================================================= */
+
+.admin-createstudents-students
+.admin-student-form > label,
+
+.admin-editstudents-students-table
+.admin-student-form > label {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 15px;
+  flex-direction: column;
+
+  gap: 7px;
+
+  min-width: 0;
+
+  color: #374151;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1.35;
 }
 
-/* ===================
-   Responsive
-=================== */
+
+/* =========================================================
+   FORM INPUT / SELECT / TEXTAREA
+   ========================================================= */
+
+.admin-createstudents-students
+.admin-student-form input,
+
+.admin-createstudents-students
+.admin-student-form select,
+
+.admin-createstudents-students
+.admin-student-form textarea,
+
+.admin-editstudents-students-table
+.admin-student-form input,
+
+.admin-editstudents-students-table
+.admin-student-form select,
+
+.admin-editstudents-students-table
+.admin-student-form textarea {
+  width: 100%;
+  min-width: 0;
+
+  min-height: 42px;
+
+  padding: 10px 13px;
+
+  box-sizing: border-box;
+
+  background: #f9fafb;
+
+  color: #1f2937;
+
+  border: 1.5px solid #cbd5e1;
+  border-radius: 9px;
+
+  outline: none;
+
+  font: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+/* =========================================================
+   PLACEHOLDERS
+   ========================================================= */
+
+.admin-createstudents-students
+.admin-student-form input::placeholder,
+
+.admin-createstudents-students
+.admin-student-form textarea::placeholder,
+
+.admin-editstudents-students-table
+.admin-student-form input::placeholder,
+
+.admin-editstudents-students-table
+.admin-student-form textarea::placeholder {
+  color: #9ca3af;
+}
+
+
+/* =========================================================
+   FIELD HOVER
+   ========================================================= */
+
+.admin-createstudents-students
+.admin-student-form input:hover:not(:disabled),
+
+.admin-createstudents-students
+.admin-student-form select:hover:not(:disabled),
+
+.admin-createstudents-students
+.admin-student-form textarea:hover:not(:disabled),
+
+.admin-editstudents-students-table
+.admin-student-form input:hover:not(:disabled),
+
+.admin-editstudents-students-table
+.admin-student-form select:hover:not(:disabled),
+
+.admin-editstudents-students-table
+.admin-student-form textarea:hover:not(:disabled) {
+  border-color: #94a3b8;
+}
+
+
+/* =========================================================
+   FIELD FOCUS
+   ========================================================= */
+
+.admin-createstudents-students
+.admin-student-form input:focus,
+
+.admin-createstudents-students
+.admin-student-form select:focus,
+
+.admin-createstudents-students
+.admin-student-form textarea:focus,
+
+.admin-editstudents-students-table
+.admin-student-form input:focus,
+
+.admin-editstudents-students-table
+.admin-student-form select:focus,
+
+.admin-editstudents-students-table
+.admin-student-form textarea:focus {
+  background: #ffffff;
+
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* =========================================================
+   TEXTAREA
+   ========================================================= */
+
+.admin-createstudents-students
+.admin-student-form textarea,
+
+.admin-editstudents-students-table
+.admin-student-form textarea {
+  min-height: 110px;
+
+  resize: vertical;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   DISABLED FIELDS
+   ========================================================= */
+
+.admin-createstudents-students
+.admin-student-form input:disabled,
+
+.admin-createstudents-students
+.admin-student-form select:disabled,
+
+.admin-createstudents-students
+.admin-student-form textarea:disabled,
+
+.admin-editstudents-students-table
+.admin-student-form input:disabled,
+
+.admin-editstudents-students-table
+.admin-student-form select:disabled,
+
+.admin-editstudents-students-table
+.admin-student-form textarea:disabled {
+  background: #f3f4f6;
+
+  color: #9ca3af;
+
+  border-color: #d1d5db;
+
+  cursor: not-allowed;
+
+  opacity: 1;
+}
+
+
+/* =========================================================
+   FORM ACTIONS
+   ========================================================= */
+
+.admin-addeditdrop-students
+.admin-student-form__actions,
+
+.admin-createstudents-students
+.admin-student-form__actions,
+
+.admin-editstudents-students-table
+.admin-student-form__actions {
+  grid-column: 1 / -1;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 6px;
+
+  padding-top: 16px;
+
+  border-top: 1px solid #d7dde4;
+}
+
+
+/* =========================================================
+   BUTTON BASE
+   Fully scoped — no global .btn leakage.
+   ========================================================= */
+
+.admin-addeditdrop-students .btn,
+.admin-createstudents-students .btn,
+.admin-editstudents-students-table .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 37px;
+
+  padding: 8px 13px;
+
+  box-sizing: border-box;
+
+  background: #f3f4f6;
+
+  color: #374151;
+
+  border: 1.5px solid #cbd5e1;
+  border-radius: 7px;
+
+  font: inherit;
+
+  font-size: 12.5px;
+  font-weight: 600;
+
+  line-height: 1.2;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+
+/* =========================================================
+   GENERIC BUTTON HOVER
+   ========================================================= */
+
+.admin-addeditdrop-students
+.btn:hover:not(:disabled),
+
+.admin-createstudents-students
+.btn:hover:not(:disabled),
+
+.admin-editstudents-students-table
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 10px rgba(15, 23, 42, 0.08);
+}
+
+
+/* =========================================================
+   BUTTON ACTIVE
+   ========================================================= */
+
+.admin-addeditdrop-students
+.btn:active:not(:disabled),
+
+.admin-createstudents-students
+.btn:active:not(:disabled),
+
+.admin-editstudents-students-table
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
+
+.admin-addeditdrop-students .btn-primary,
+.admin-createstudents-students .btn-primary,
+.admin-editstudents-students-table .btn-primary {
+  background: #2563eb;
+
+  color: #ffffff;
+
+  border-color: #2563eb;
+
+  box-shadow:
+    0 2px 5px rgba(37, 99, 235, 0.12);
+}
+
+.admin-addeditdrop-students
+.btn-primary:hover:not(:disabled),
+
+.admin-createstudents-students
+.btn-primary:hover:not(:disabled),
+
+.admin-editstudents-students-table
+.btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+
+  color: #ffffff;
+
+  border-color: #1d4ed8;
+
+  box-shadow:
+    0 5px 12px rgba(37, 99, 235, 0.18);
+}
+
+
+/* =========================================================
+   SECONDARY BUTTON
+   ========================================================= */
+
+.admin-addeditdrop-students .btn-secondary,
+.admin-createstudents-students .btn-secondary,
+.admin-editstudents-students-table .btn-secondary {
+  background: #f3f4f6;
+
+  color: #374151;
+
+  border-color: #cbd5e1;
+}
+
+.admin-addeditdrop-students
+.btn-secondary:hover:not(:disabled),
+
+.admin-createstudents-students
+.btn-secondary:hover:not(:disabled),
+
+.admin-editstudents-students-table
+.btn-secondary:hover:not(:disabled) {
+  background: #e5e7eb;
+
+  border-color: #94a3b8;
+}
+
+
+/* =========================================================
+   DANGER / DROP BUTTON
+   ========================================================= */
+
+.admin-addeditdrop-students .btn-danger,
+.admin-createstudents-students .btn-danger,
+.admin-editstudents-students-table .btn-danger {
+  background: #fef2f2;
+
+  color: #b91c1c;
+
+  border-color: #fecaca;
+}
+
+.admin-addeditdrop-students
+.btn-danger:hover:not(:disabled),
+
+.admin-createstudents-students
+.btn-danger:hover:not(:disabled),
+
+.admin-editstudents-students-table
+.btn-danger:hover:not(:disabled) {
+  background: #fee2e2;
+
+  color: #991b1b;
+
+  border-color: #fca5a5;
+
+  box-shadow:
+    0 4px 10px rgba(220, 38, 38, 0.1);
+}
+
+
+/* =========================================================
+   WARNING BUTTON
+   Future-safe for transfer / special actions.
+   ========================================================= */
+
+.admin-addeditdrop-students .btn-warning,
+.admin-createstudents-students .btn-warning,
+.admin-editstudents-students-table .btn-warning {
+  background: #fffbeb;
+
+  color: #b45309;
+
+  border-color: #fde68a;
+}
+
+.admin-addeditdrop-students
+.btn-warning:hover:not(:disabled),
+
+.admin-createstudents-students
+.btn-warning:hover:not(:disabled),
+
+.admin-editstudents-students-table
+.btn-warning:hover:not(:disabled) {
+  background: #fef3c7;
+
+  border-color: #fcd34d;
+}
+
+
+/* =========================================================
+   SUCCESS BUTTON
+   ========================================================= */
+
+.admin-addeditdrop-students .btn-success,
+.admin-createstudents-students .btn-success,
+.admin-editstudents-students-table .btn-success {
+  background: #ecfdf5;
+
+  color: #047857;
+
+  border-color: #6ee7b7;
+}
+
+.admin-addeditdrop-students
+.btn-success:hover:not(:disabled),
+
+.admin-createstudents-students
+.btn-success:hover:not(:disabled),
+
+.admin-editstudents-students-table
+.btn-success:hover:not(:disabled) {
+  background: #d1fae5;
+
+  border-color: #34d399;
+}
+
+
+/* =========================================================
+   DISABLED BUTTON
+   ========================================================= */
+
+.admin-addeditdrop-students .btn:disabled,
+.admin-createstudents-students .btn:disabled,
+.admin-editstudents-students-table .btn:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   FOCUS VISIBLE
+   ========================================================= */
+
+.admin-addeditdrop-students button:focus-visible,
+.admin-addeditdrop-students input:focus-visible,
+.admin-addeditdrop-students select:focus-visible,
+
+.admin-createstudents-students button:focus-visible,
+.admin-createstudents-students input:focus-visible,
+.admin-createstudents-students select:focus-visible,
+.admin-createstudents-students textarea:focus-visible,
+
+.admin-editstudents-students-table button:focus-visible,
+.admin-editstudents-students-table input:focus-visible,
+.admin-editstudents-students-table select:focus-visible,
+.admin-editstudents-students-table textarea:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.18);
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   HORIZONTAL SCROLLBAR
+   ========================================================= */
+
+.admin-addeditdrop-students::-webkit-scrollbar {
+  height: 8px;
+}
+
+.admin-addeditdrop-students::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-addeditdrop-students::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+
+  border-radius: 999px;
+}
+
+.admin-addeditdrop-students::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
 
 @media (max-width: 992px) {
+  .admin-addeditdrop-students
   .admin-manage-students__header {
     flex-direction: column;
+
     align-items: flex-start;
-    gap: 15px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .admin-addeditdrop-students,
+  .admin-createstudents-students,
+  .admin-editstudents-students-table {
+    padding: 18px;
+
+    border-radius: 12px;
   }
 
-  .admin-manage-students__search {
+
+  .admin-addeditdrop-students
+  .admin-manage-students__header h1,
+
+  .admin-createstudents-students > h1,
+
+  .admin-editstudents-students-table > h1 {
+    font-size: 22px;
+  }
+
+
+  .admin-createstudents-students
+  .admin-student-form,
+
+  .admin-editstudents-students-table
+  .admin-student-form {
+    grid-template-columns: 1fr;
+
+    padding: 18px;
+  }
+
+
+  .admin-addeditdrop-students
+  .admin-student-form__actions,
+
+  .admin-createstudents-students
+  .admin-student-form__actions,
+
+  .admin-editstudents-students-table
+  .admin-student-form__actions {
+    grid-column: auto;
+
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+  }
+
+
+  .admin-addeditdrop-students
+  .admin-student-form__actions .btn,
+
+  .admin-createstudents-students
+  .admin-student-form__actions .btn,
+
+  .admin-editstudents-students-table
+  .admin-student-form__actions .btn {
     width: 100%;
   }
 
-  .admin-manage-students {
-    padding: 20px;
+
+  .admin-addeditdrop-students
+  .admin-manage-students__search,
+
+  .admin-createstudents-students
+  .admin-student-form input,
+
+  .admin-createstudents-students
+  .admin-student-form select,
+
+  .admin-createstudents-students
+  .admin-student-form textarea,
+
+  .admin-editstudents-students-table
+  .admin-student-form input,
+
+  .admin-editstudents-students-table
+  .admin-student-form select,
+
+  .admin-editstudents-students-table
+  .admin-student-form textarea {
+    font-size: 16px;
   }
 }
 
-@media (max-width: 768px) {
-  .admin-manage-students__table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .admin-addeditdrop-students,
+  .admin-createstudents-students,
+  .admin-editstudents-students-table {
+    padding: 14px;
   }
 
-  .admin-manage-students__header h1 {
-    font-size: 28px;
+
+  .admin-createstudents-students
+  .admin-student-form,
+
+  .admin-editstudents-students-table
+  .admin-student-form {
+    padding: 15px;
   }
 
-  .btn {
-    padding: 8px 14px;
-    font-size: 13px;
+
+  .admin-addeditdrop-students
+  .admin-manage-students__header h1,
+
+  .admin-createstudents-students > h1,
+
+  .admin-editstudents-students-table > h1 {
+    font-size: 21px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+
+   Main entrance/table animations are supplied by the
+   shared admin-theme.css. This section ensures users who
+   request reduced motion are respected.
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-addeditdrop-students,
+  .admin-addeditdrop-students *,
+
+  .admin-createstudents-students,
+  .admin-createstudents-students *,
+
+  .admin-editstudents-students-table,
+  .admin-editstudents-students-table * {
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
   }
 }

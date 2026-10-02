@@ -4,19 +4,90 @@ export const registrarSoloLinks = [
   {
     label: "Dashboard",
     path: "/registrar/dashboard",
-    icon: "🏠",
+    icon: "",
+  },
+  {
+    label: "Announcement",
+    path: "/registrar/announcement/listR",
+    icon: "",
+  },
+  {
+    label: "Student List",
+    path: "/registrar/student/listR",
+    icon: "",
   },
 ];
 
 export const registrarNavGroups = [
   {
-    id: "students",
-    label: "Student Records",
-    icon: "👨‍🎓",
+    id: "academic",
+    label: "Academic",
+    icon: "",
     children: [
       {
-        label: "Records",
-        path: "/registrar/student/records",
+        label: "Courses",
+        path: "/registrar/course/management",
+        icon: "",
+      },
+      {
+        label: "Curriculum",
+        path: "/registrar/curriculum/management",
+        icon: "",
+      },
+      {
+        label: "Departments",
+        path: "/registrar/department/management",
+        icon: "",
+      },
+      {
+        label: "Subjects",
+        path: "/registrar/subjects/management",
+        icon: "",
+      },
+    ],
+  },
+  {
+    id: "enrollment",
+    label: "Enrollment ",
+    icon: "",
+    children: [
+      {
+        label: "Student Enrollment",
+        path: "/registrar/enrollment/management",
+        icon: "",
+      },
+      {
+        label: "Enrollment Period",
+        path: "/registrar/enrollment/periodM",
+        icon: "",
+      },
+      {
+        label: "Class Offering",
+        path: "/registrar/offering/managementR",
+        icon: "",
+      },
+      {
+        label: "Teaching Schedules",
+        path: "/registrar/schedules/faculty",
+        icon: "",
+      },
+    ],
+  },
+
+  {
+    id: "Document",
+    label: "Documents ",
+    icon: "",
+    children: [
+      {
+        label: "Request Verification",
+        path: "/registrar/document-requests",
+        icon: "",
+      },
+      {
+        label: "Grade Change Requests",
+        path: "/registrar/grade-change-requests",
+        icon: "",
       },
     ],
   },

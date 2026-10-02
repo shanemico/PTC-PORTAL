@@ -1,17 +1,18 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import "../../styles/herolayout.css";
-import logo from "../../assets/ptclogo.jpg";
 
 import ptcBackground from "../../assets/ptcbackground.jpg";
+import campusExterior from "../../assets/campus.webp";
+import classroom from "../../assets/classrooms.webp";
+import assembly from "../../assets/student activities.png";
+import library from "../../assets/GROUP6.png";
+import studentsWalking from "../../assets/BG.png";
 
-// ── Types ──────────────────────────────────────────
 interface GalleryImage {
   url: string;
   caption: string;
 }
-
-// ── Constants ──────────────────────────────────────
-const NAV_LINKS: string[] = ["Home", "About", "Programs", "Contact"];
 
 const IMAGES: GalleryImage[] = [
   {
@@ -19,91 +20,86 @@ const IMAGES: GalleryImage[] = [
     caption: "Campus Life",
   },
   {
-    url: "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80",
+    url: campusExterior,
     caption: "Our Campus",
   },
   {
-    url: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=900&q=80",
+    url: classroom,
     caption: "Modern Classrooms",
   },
   {
-    url: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=900&q=80",
+    url: assembly,
     caption: "Student Activities",
   },
   {
-    url: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=900&q=80",
+    url: library,
     caption: "Research Facilities",
   },
   {
-    url: "https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=900&q=80",
+    url: studentsWalking,
     caption: "Student Community",
   },
 ];
 
-// ── Component ──────────────────────────────────────
-export default function HeroLayout() {
-  const navigate = useNavigate();
+export default function HomeScreen() {
+  const [currentImage, setCurrentImage] = useState(0);
 
-  const handleLogin = (): void => {
-    navigate("/login");
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % IMAGES.length);
+    }, 5000);
 
-  const handleAdmission = (): void => {
-    navigate("/Register");
-  };
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="root">
-      {/* ── HEADER ────────────────────────────────── */}
-      <header className="header">
-        <div className="logo">
-          <div className="logoMark">
-            <img src={logo} alt="Logo" />
-          </div>
-          <span className="logoText">PTC PORTAL</span>
-        </div>
-
-        <nav className="nav">
-          {NAV_LINKS.map((link) => (
-            <a key={link} href="#" className="navLink">
-              {link}
-            </a>
-          ))}
-        </nav>
-
-        <div className="ctaGroup">
-          <button className="btnLogin" onClick={handleLogin}>
-            Log In
-          </button>
-          <button className="btnAdmission" onClick={handleAdmission}>
-            Apply Now
-          </button>
-        </div>
-      </header>
-
-      {/* ── MAIN ──────────────────────────────────── */}
+      {/* MAIN */}
       <main className="main">
-        {/* LEFT — Greeting */}
+        {/* LEFT PANEL */}
         <div className="leftPanel">
           <p className="greeting">Welcome to Pateros Technological College</p>
+
           <h1 className="headline">
             Where great <br />
             <em className="headlineAccent">minds</em> grow.
           </h1>
+
           <p className="tagline">
             A place built for curiosity, driven by ambition, and defined by the
             people who walk its halls.
           </p>
         </div>
 
-        {/* RIGHT — Scroll Gallery */}
+        {/* IMAGE SLIDESHOW */}
         <div className="rightPanel">
           <div className="gallery">
-            {IMAGES.map((img) => (
-              <div key={img.url} className="galleryItem">
-                <img src={img.url} alt={img.caption} loading="lazy" />
+            {IMAGES.map((img, index) => (
+              <div
+                key={`${img.url}-${index}`}
+                className={`galleryItem ${
+                  index === currentImage ? "active" : ""
+                }`}
+              >
+                <img src={img.url} alt={img.caption} />
+
                 <div className="galleryCaption">{img.caption}</div>
               </div>
+            ))}
+          </div>
+
+          {/* SLIDE INDICATORS */}
+          <div className="galleryIndicators">
+            {IMAGES.map((_, index) => (
+              <button
+                type="button"
+                key={index}
+                className={`indicator ${
+                  index === currentImage ? "active" : ""
+                }`}
+                onClick={() => setCurrentImage(index)}
+                aria-label={`Go to image ${index + 1}`}
+              />
             ))}
           </div>
         </div>

@@ -1,157 +1,713 @@
+/* =========================================================
+   ADMIN USER ROLES MANAGEMENT
+   PTC Portal Admin Theme
+
+   Used by:
+   - UserRoles.tsx
+
+   Features:
+   - Full-width Admin green shell
+   - Strong visible box borders
+   - Role-specific color coding
+   - Card entrance/hover animation
+   - Clean permission layout
+   - Responsive design
+   - Fully scoped selectors
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE CONTAINER
+   ========================================================= */
+
 .user-role-container {
-  padding: 25px;
-}
+  width: 100%;
+  max-width: none;
+  min-width: 0;
 
-/* Header */
-
-.role-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.role-header h1 {
-  font-size: 28px;
-  color: #1f2937;
-  margin-bottom: 8px;
-}
-
-.role-header p {
-  color: #6b7280;
-}
-
-/* Create Button */
-
-.add-role-btn {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.3s;
-}
-
-.add-role-btn:hover {
-  background: #1d4ed8;
-}
-
-/* Roles Grid */
-
-.roles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 25px;
-}
-
-/* Role Card */
-
-.role-card {
-  background: white;
-  border-radius: 12px;
-  padding: 22px;
-
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-  border-left: 5px solid #2563eb;
-
-  transition: 0.3s;
-}
-
-.role-card:hover {
-  transform: translateY(-5px);
-}
-
-/* Role title */
-
-.role-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.role-title h2 {
   margin: 0;
+
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  background: linear-gradient(
+    180deg,
+    #66c44f 0%,
+    #f4f5f1 100%
+  );
+
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 8px 24px rgba(0, 0, 0, 0.05);
+
+  color: #1f2937;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.user-role-container .role-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 18px;
+
+  margin-bottom: 26px;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.9);
+
+  flex-wrap: wrap;
+}
+
+.user-role-container .role-header > div {
+  min-width: 0;
+}
+
+.user-role-container .role-header h1 {
+  margin: 0 0 6px;
+
   color: #111827;
-  font-size: 22px;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  letter-spacing: -0.01em;
 }
 
-.role-title span {
-  background: #dbeafe;
-  color: #1d4ed8;
+.user-role-container .role-header p {
+  margin: 0;
 
-  padding: 5px 12px;
+  color: #374151;
 
-  border-radius: 20px;
-
-  font-size: 13px;
-}
-
-/* Description */
-
-.role-description {
-  margin: 18px 0;
-
-  color: #6b7280;
+  font-size: 14px;
 
   line-height: 1.5;
 }
 
-/* Permissions */
 
-.permission-section h3 {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
+/* =========================================================
+   CREATE ROLE BUTTON
+   ========================================================= */
 
-.permission-section ul {
-  padding-left: 20px;
-}
+.user-role-container .add-role-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-.permission-section li {
-  margin-bottom: 7px;
+  min-height: 40px;
 
-  color: #374151;
-}
+  padding: 9px 16px;
 
-/* Edit Button */
+  flex-shrink: 0;
 
-.edit-role-btn {
-  width: 100%;
+  background: #2563eb;
 
-  margin-top: 20px;
+  color: #ffffff;
 
-  padding: 10px;
-
-  border: none;
-
+  border: 1.5px solid #2563eb;
   border-radius: 8px;
 
-  background: #f3f4f6;
+  font: inherit;
 
-  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
 
   cursor: pointer;
 
+  box-shadow:
+    0 2px 5px rgba(37, 99, 235, 0.14);
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.user-role-container .add-role-btn:hover {
+  background: #1d4ed8;
+
+  border-color: #1d4ed8;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 6px 14px rgba(37, 99, 235, 0.2);
+}
+
+.user-role-container .add-role-btn:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================================================
+   ROLES GRID
+   ========================================================= */
+
+.user-role-container .roles-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(280px, 1fr)
+    );
+
+  gap: 18px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* =========================================================
+   ROLE CARD
+   ========================================================= */
+
+.user-role-container .role-card {
+  --role-color: #4f46e5;
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 100%;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1.5px solid #cbd5e1;
+  border-radius: 11px;
+
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.05),
+    0 5px 14px rgba(15, 23, 42, 0.04);
+
+  overflow: hidden;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+/* =========================================================
+   ROLE COLOR TOP LINE
+   ========================================================= */
+
+.user-role-container .role-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 4px;
+
+  background: var(--role-color);
+}
+
+
+/* =========================================================
+   ROLE CARD HOVER
+   ========================================================= */
+
+.user-role-container .role-card:hover {
+  transform: translateY(-3px);
+
+  border-color: #aeb9c7;
+
+  box-shadow:
+    0 5px 12px rgba(15, 23, 42, 0.07),
+    0 12px 26px rgba(15, 23, 42, 0.06);
+}
+
+
+/* =========================================================
+   CARD TITLE ROW
+   ========================================================= */
+
+.user-role-container .role-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  min-width: 0;
+
+  margin-top: 2px;
+}
+
+
+/* =========================================================
+   LEFT TITLE GROUP
+   ========================================================= */
+
+.user-role-container .role-title-left {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  min-width: 0;
+}
+
+
+/* =========================================================
+   ROLE AVATAR
+   ========================================================= */
+
+.user-role-container .role-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  border: 1.5px solid
+    color-mix(
+      in srgb,
+      var(--role-color) 30%,
+      #d1d5db
+    );
+
+  border-radius: 9px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--role-color) 12%,
+      #ffffff
+    );
+
+  color: var(--role-color);
+
+  font-size: 15px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   ROLE NAME
+   ========================================================= */
+
+.user-role-container .role-title h2 {
+  margin: 0;
+
+  min-width: 0;
+
+  color: #111827;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  letter-spacing: -0.01em;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   USER COUNT BADGE
+   ========================================================= */
+
+.user-role-container .role-title > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  padding: 5px 10px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--role-color) 10%,
+      #ffffff
+    );
+
+  color: var(--role-color);
+
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--role-color) 26%,
+      #e5e7eb
+    );
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
+.user-role-container .role-description {
+  margin: 16px 0 18px;
+
+  color: #6b7280;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   PERMISSION SECTION
+   ========================================================= */
+
+.user-role-container .permission-section {
+  flex: 1;
+
+  padding: 15px;
+
+  background: #f9fafb;
+
+  border: 1.5px solid #d7dde4;
+  border-radius: 9px;
+}
+
+
+/* =========================================================
+   PERMISSION TITLE
+   ========================================================= */
+
+.user-role-container .permission-section h3 {
+  margin: 0 0 11px;
+
+  color: #6b7280;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.06em;
+}
+
+
+/* =========================================================
+   PERMISSION LIST
+   ========================================================= */
+
+.user-role-container .permission-section ul {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin: 0;
+
+  padding: 0;
+
+  list-style: none;
+}
+
+
+/* =========================================================
+   PERMISSION ITEM
+   ========================================================= */
+
+.user-role-container .permission-section li {
+  position: relative;
+
+  padding:
+    7px
+    9px
+    7px
+    24px;
+
+  background: #ffffff;
+
+  color: #374151;
+
+  border: 1px solid #e2e7ec;
+  border-radius: 7px;
+
+  font-size: 12.5px;
   font-weight: 500;
+
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.15s ease;
 }
 
-.edit-role-btn:hover {
-  background: #e5e7eb;
+
+/* =========================================================
+   PERMISSION DOT
+   ========================================================= */
+
+.user-role-container .permission-section li::before {
+  content: "";
+
+  position: absolute;
+
+  top: 50%;
+  left: 10px;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: var(--role-color);
+
+  transform: translateY(-50%);
 }
 
-/* Responsive */
+
+/* =========================================================
+   PERMISSION HOVER
+   ========================================================= */
+
+.user-role-container .permission-section li:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(--role-color) 4%,
+      #ffffff
+    );
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--role-color) 24%,
+      #d7dde4
+    );
+
+  transform: translateX(2px);
+}
+
+
+/* =========================================================
+   EDIT PERMISSIONS BUTTON
+   ========================================================= */
+
+.user-role-container .edit-role-btn {
+  width: 100%;
+
+  min-height: 39px;
+
+  margin-top: 16px;
+
+  padding: 9px 13px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--role-color) 7%,
+      #ffffff
+    );
+
+  color: var(--role-color);
+
+  border: 1.5px solid
+    color-mix(
+      in srgb,
+      var(--role-color) 25%,
+      #cbd5e1
+    );
+
+  border-radius: 8px;
+
+  font: inherit;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+
+/* =========================================================
+   EDIT BUTTON HOVER
+   ========================================================= */
+
+.user-role-container .edit-role-btn:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(--role-color) 12%,
+      #ffffff
+    );
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--role-color) 45%,
+      #cbd5e1
+    );
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 10px
+      color-mix(
+        in srgb,
+        var(--role-color) 12%,
+        transparent
+      );
+}
+
+.user-role-container .edit-role-btn:active {
+  transform: scale(0.98);
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+.user-role-container .add-role-btn:focus-visible,
+.user-role-container .edit-role-btn:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.18);
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 992px) {
+  .user-role-container .roles-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
 @media (max-width: 768px) {
-  .role-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
+  .user-role-container {
+    padding: 18px;
+
+    border-radius: 12px;
   }
 
-  .add-role-btn {
+  .user-role-container .role-header {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 14px;
+  }
+
+  .user-role-container .add-role-btn {
     width: 100%;
+  }
+
+  .user-role-container .roles-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .user-role-container {
+    padding: 14px;
+  }
+
+  .user-role-container .role-header h1 {
+    font-size: 21px;
+  }
+
+  .user-role-container .role-card {
+    padding: 18px;
+  }
+
+  .user-role-container .role-title {
+    align-items: flex-start;
+  }
+
+  .user-role-container .role-title > span {
+    font-size: 10.5px;
+  }
+
+  .user-role-container .role-avatar {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .user-role-container,
+  .user-role-container * {
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
   }
 }

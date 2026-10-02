@@ -1,557 +1,663 @@
-﻿import DashboardLayout from "../../components/Layout/DashboardLayout";
-import { authService } from "../../services/auth.service";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
-import { Camera, LoaderCircle, ShieldCheck, Trash2, UserRound } from "lucide-react";
-import type { StudentProfile } from "../../types/studentProfile";
-import "../styles/Profile.css";
+import {
+  BookOpen,
+  CalendarDays,
+  CircleAlert,
+  GraduationCap,
+  Home,
+  IdCard,
+  Mail,
+  MapPin,
+  Phone,
+  RefreshCw,
+  ShieldCheck,
+  UserRound,
+  UsersRound,
+} from "lucide-react";
 
-type StudentStatus = "Active" | "Inactive" | "Graduated" | "Dropped" | "Suspended" | "On Leave";
+import DashboardLayout from "../../components/Layout/DashboardLayout";
+import { authService } from "../../services/auth.service";
+import { apiUrl } from "../../services/api";
+import "../../styles/StudentSelfProfile.css";
 
-type Student = {
-  studentNumber: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  gender?: string;
-  birthDate?: string;
-  course?: string;
-  yearLevel?: string;
-  section?: string;
-  semester?: string;
-  contactNumber?: string;
-  email?: string;
-  houseNo?: string;
-  street?: string;
-  barangay?: string;
-  city?: string;
-  province?: string;
-  zipCode?: string;
-  address?: string;
-  enrollmentStatus?: string;
-  studentStatus?: StudentStatus;
-  guardianName?: string;
-  guardianRelationship?: string;
-  guardianContact?: string;
-  avatar?: string | null;
-};
+interface StudentProfileData {
+  photo: string | null;
 
-const STUDENT_STORAGE_KEY = "student_profile";
-const API_BASE_URL = "http://localhost:3000";
+  full_name: string;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+
+  student_number: string;
+
+  email: string | null;
+  contact_number: string | null;
+  gender: string | null;
+  birth_date: string | null;
+  address: string | null;
+
+  course: {
+    course_id: number | null;
+    course_code: string | null;
+    course_name: string | null;
+  };
+
+  year_level: number | null;
+
+  section: {
+    section_id: number | null;
+    section_name: string | null;
+  };
+
+  academic_year: {
+    academic_year_id: number | null;
+    academic_year: string | null;
+  };
+
+  semester: {
+    semester_id: number | null;
+    semester_name: string | null;
+  };
+
+  enrollment_status: string | null;
+  student_status: string | null;
+
+  guardian: {
+    guardian_name: string | null;
+    relationship: string | null;
+    contact_number: string | null;
+  } | null;
+}
+
+interface StudentProfileResponse {
+  success?: boolean;
+  code?: string;
+  message?: string;
+  error?: string;
+  profile?: StudentProfileData;
+}
+
+function formatValue(value: string | number | null | undefined) {
+  if (value === null || value === undefined || String(value).trim() === "") {
+    return "Not provided";
+  }
+
+  return String(value);
+}
+
+function formatYearLevel(value: number | null | undefined) {
+  if (!value) return "Not provided";
+
+  const suffix =
+    value === 1 ? "st" : value === 2 ? "nd" : value === 3 ? "rd" : "th";
+
+  return `${value}${suffix} Year`;
+}
+
+function formatDate(value: string | null | undefined) {
+  if (!value) return "Not provided";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString("en-PH", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function getInitials(fullName: string) {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) return "ST";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+
+  return `${parts[0][0] || ""}${parts[parts.length - 1][0] || ""}`.toUpperCase();
+}
+
+function getStatusClass(value: string | null | undefined) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-");
+
+  if (["approved", "active", "enrolled"].includes(normalized)) {
+    return "positive";
+  }
+
+  if (["pending", "draft", "under-review"].includes(normalized)) {
+    return "pending";
+  }
+
+  if (["rejected", "dropped", "inactive", "transferred"].includes(normalized)) {
+    return "negative";
+  }
+
+  return "neutral";
+}
+
+function buildPhotoUrl(photo: string | null) {
+  if (!photo) return "";
+
+  const trimmed = photo.trim();
+
+  if (!trimmed) return "";
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  const normalized = trimmed.replace(/\\/g, "/").replace(/^\/+/, "");
+
+  return apiUrl(normalized);
+}
 
 export default function StudentProfile() {
   const navigate = useNavigate();
+
   const user = authService.getSession();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const token = authService.getToken();
+  const authenticated = Boolean(user && token);
+  const userRole = user?.role;
 
-  const safeUser = user ?? {
-    user_id: 0,
-    username: "Student",
-    email: "",
-    role: "Student" as const,
-    role_id: 0,
-  };
-
-  useEffect(() => {
-    if (!user || user.role !== "Student") {
-      navigate("/login");
-    }
-  }, [navigate, user]);
-
-  const buildFallbackStudent = (): Student => ({
-    studentNumber: String(safeUser.role_id ?? "000000"),
-    firstName: safeUser.username ?? "Student",
-    middleName: "",
-    lastName: "",
-    gender: "",
-    birthDate: "",
-    course: "",
-    yearLevel: "",
-    section: "",
-    semester: "",
-    contactNumber: "",
-    email: safeUser.email ?? "",
-    houseNo: "",
-    street: "",
-    barangay: "",
-    city: "",
-    province: "",
-    zipCode: "",
-    address: "",
-    enrollmentStatus: "Active",
-    studentStatus: "Active",
-    guardianName: "",
-    guardianRelationship: "",
-    guardianContact: "",
-    avatar: null,
-  });
-
-  const loadStored = (): Student => {
-    try {
-      const raw = localStorage.getItem(STUDENT_STORAGE_KEY);
-      if (!raw) return buildFallbackStudent();
-
-      const parsed = JSON.parse(raw) as Partial<Student>;
-      return { ...buildFallbackStudent(), ...parsed };
-    } catch {
-      return buildFallbackStudent();
-    }
-  };
-
-  const [student, setStudent] = useState<Student>(() => loadStored());
-  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
-
-  const mapProfileResponse = (profile: StudentProfile): Student => {
-    const addressParts = [profile.address].filter(Boolean);
-
-    return {
-      studentNumber: profile.studentNumber || profile.studentId?.toString() || "",
-      firstName: profile.firstName || "",
-      middleName: profile.middleName || "",
-      lastName: profile.lastName || "",
-      gender: profile.gender || "",
-      birthDate: profile.birthDate || "",
-      course: profile.course || "",
-      yearLevel: profile.yearLevel || "",
-      section: profile.section || "",
-      semester: "",
-      contactNumber: profile.contactNumber || "",
-      email: profile.email || "",
-      address: addressParts.join(", ") || "",
-      enrollmentStatus: profile.enrollmentStatus || "",
-      studentStatus: (profile.enrollmentStatus === "Active" ? "Active" : "Inactive") as StudentStatus,
-      guardianName: profile.guardianName || "",
-      guardianRelationship: profile.guardianRelationship || "",
-      guardianContact: profile.guardianContact || "",
-      avatar: profile.photo || null,
-    };
-  };
+  const [profile, setProfile] = useState<StudentProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    if (!authenticated) {
+      authService.logout();
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    if (userRole !== "Student") {
+      if (userRole) {
+        navigate(authService.getDashboardRoute(userRole), { replace: true });
+      } else {
+        navigate("/login", { replace: true });
+      }
+    }
+  }, [authenticated, userRole, navigate]);
+
+  useEffect(() => {
+    if (!authenticated || userRole !== "Student") {
+      return;
+    }
+
+    const controller = new AbortController();
+
     const loadProfile = async () => {
-      if (!user) {
-        return;
-      }
-
-
       try {
-        const response = await fetch(`${API_BASE_URL}/api/profile/${encodeURIComponent(String(user.user_id))}`);
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data?.message || "Unable to load your profile.");
+        if (refreshKey === 0) {
+          setLoading(true);
+        } else {
+          setRefreshing(true);
         }
 
-        const profile = data?.data as StudentProfile | undefined;
-        if (profile) {
-          const mappedStudent = mapProfileResponse(profile);
-          const mergedStudent = { ...buildFallbackStudent(), ...mappedStudent };
-          setStudent(mergedStudent);
-          localStorage.setItem(STUDENT_STORAGE_KEY, JSON.stringify(mergedStudent));
+        setError("");
+
+        const response = await authService.authFetch(
+          apiUrl("/api/student/profile"),
+          {
+            method: "GET",
+            signal: controller.signal,
+            headers: {
+              Accept: "application/json",
+            },
+          },
+        );
+
+        const contentType = response.headers.get("content-type") || "";
+        let data: StudentProfileResponse | null = null;
+
+        if (contentType.includes("application/json")) {
+          data = (await response.json()) as StudentProfileResponse;
+        } else {
+          const text = await response.text();
+
+          throw new Error(
+            `Server returned a non-JSON response (${response.status}): ${text.slice(
+              0,
+              180,
+            )}`,
+          );
         }
-      } catch (error) {
-        setFeedback({
-          type: "error",
-          message: error instanceof Error ? error.message : "Unable to load your profile.",
-        });
+
+        if (response.status === 401) {
+          authService.logout();
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        if (response.status === 403) {
+          throw new Error(
+            data?.message || "Student access is required to view this profile.",
+          );
+        }
+
+        if (!response.ok || !data?.success) {
+          throw new Error(
+            data?.message ||
+              data?.error ||
+              `Failed to load student profile (${response.status}).`,
+          );
+        }
+
+        if (!data.profile) {
+          throw new Error(
+            "Student profile data was not returned by the server.",
+          );
+        }
+
+        setProfile(data.profile);
+        setPhotoFailed(false);
+      } catch (requestError) {
+        if (
+          requestError instanceof DOMException &&
+          requestError.name === "AbortError"
+        ) {
+          return;
+        }
+
+        console.error("LOAD STUDENT PROFILE ERROR:", requestError);
+        setProfile(null);
+
+        if (requestError instanceof TypeError) {
+          setError(
+            "Unable to connect to the Student profile server. Make sure the backend is running on port 3000.",
+          );
+          return;
+        }
+
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Unable to load Student profile.",
+        );
       } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+          setRefreshing(false);
+        }
       }
     };
 
-    loadProfile();
-  }, [user]);
+    void loadProfile();
 
-  useEffect(() => {
-    if (!selectedPhoto) {
-      setPreviewUrl(null);
-      return;
-    }
+    return () => controller.abort();
+  }, [authenticated, userRole, navigate, refreshKey]);
 
-    const objectUrl = URL.createObjectURL(selectedPhoto);
-    setPreviewUrl(objectUrl);
+  const photoUrl = useMemo(
+    () => buildPhotoUrl(profile?.photo || null),
+    [profile?.photo],
+  );
 
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedPhoto]);
+  const courseLabel = profile
+    ? [profile.course.course_code, profile.course.course_name]
+        .filter(Boolean)
+        .join(" — ")
+    : "";
 
-  const getStatusClass = (status?: StudentStatus) => {
-    switch (status) {
-      case "Active":
-        return "status-pill active";
-      case "Inactive":
-        return "status-pill inactive";
-      case "Graduated":
-        return "status-pill graduated";
-      case "Dropped":
-        return "status-pill dropped";
-      case "Suspended":
-        return "status-pill suspended";
-      case "On Leave":
-        return "status-pill leave";
-      default:
-        return "status-pill active";
-    }
-  };
+  const enrollmentStatus = profile?.enrollment_status || "Not Enrolled";
 
-  const handlePhotoSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    const isValidType = /image\/(jpeg|jpg|png|webp)$/i.test(file.type);
-    const isValidSize = file.size <= 5 * 1024 * 1024;
-
-    if (!isValidType || !isValidSize) {
-      setFeedback({
-        type: "error",
-        message: "Please choose a JPG, JPEG, PNG, or WEBP image under 5 MB.",
-      });
-      event.target.value = "";
-      return;
-    }
-
-    setSelectedPhoto(file);
-    setFeedback(null);
-  };
-
-  const persistStudent = (updatedStudent: Student) => {
-    setStudent(updatedStudent);
-    localStorage.setItem(STUDENT_STORAGE_KEY, JSON.stringify(updatedStudent));
-  };
-
-  const uploadPhoto = async () => {
-    if (!selectedPhoto) return;
-
-    setIsUploading(true);
-    setFeedback(null);
-
-    const formData = new FormData();
-    formData.append("photo", selectedPhoto);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/students/${encodeURIComponent(student.studentNumber || String(safeUser.user_id))}/photo`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Unable to upload your profile picture.");
-      }
-
-      const updatedStudent = { ...student, avatar: data.url || null };
-      persistStudent(updatedStudent);
-      setSelectedPhoto(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      setFeedback({ type: "success", message: "Profile picture uploaded successfully." });
-    } catch (error) {
-      setFeedback({
-        type: "error",
-        message: error instanceof Error ? error.message : "Unable to upload your profile picture.",
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const removePhoto = async () => {
-    if (!student.avatar) return;
-
-    const confirmed = window.confirm("Remove your current profile picture?");
-    if (!confirmed) return;
-
-    setIsDeleting(true);
-    setFeedback(null);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/students/${encodeURIComponent(student.studentNumber || String(safeUser.user_id))}/photo`, {
-        method: "DELETE",
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Unable to remove your profile picture.");
-      }
-
-      const updatedStudent = { ...student, avatar: null };
-      persistStudent(updatedStudent);
-      setSelectedPhoto(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      setFeedback({ type: "success", message: "Profile picture removed successfully." });
-    } catch (error) {
-      setFeedback({
-        type: "error",
-        message: error instanceof Error ? error.message : "Unable to remove your profile picture.",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  if (!authenticated || !user || userRole !== "Student") {
+    return null;
+  }
 
   return (
     <DashboardLayout>
-      <div className="profile-page">
-        <div className="profile-hero">
+      <main className="student-self-profile">
+        <section className="student-self-profile__page-hero">
           <div>
-            <p className="profile-eyebrow">Student Account</p>
-            <h1>My Profile</h1>
+            <div className="student-self-profile__eyebrow">
+              <span className="student-self-profile__eyebrow-icon">
+                <UserRound size={16} strokeWidth={2.2} />
+              </span>
+              Student · Profile
+            </div>
+
+            <h1>Student Profile</h1>
             <p>
-              This page displays your official student record as maintained by the Administration Office.
+              View your personal, academic, and guardian information recorded in
+              the PTC Portal.
             </p>
           </div>
-          <div className="profile-badges">
-            <span className="profile-badge">
-              <ShieldCheck size={16} /> Verified Account
+
+          <button
+            type="button"
+            className="student-self-profile__refresh"
+            onClick={() => setRefreshKey((current) => current + 1)}
+            disabled={loading || refreshing}
+          >
+            <RefreshCw size={16} className={refreshing ? "is-spinning" : ""} />
+            {refreshing ? "Refreshing..." : "Refresh"}
+          </button>
+        </section>
+
+        {loading && (
+          <section
+            className="student-self-profile__loading"
+            aria-label="Loading student profile"
+          >
+            <div className="student-self-profile__skeleton student-self-profile__skeleton--header" />
+            <div className="student-self-profile__skeleton-grid">
+              <div className="student-self-profile__skeleton student-self-profile__skeleton--card" />
+              <div className="student-self-profile__skeleton student-self-profile__skeleton--card" />
+              <div className="student-self-profile__skeleton student-self-profile__skeleton--card" />
+            </div>
+          </section>
+        )}
+
+        {!loading && error && (
+          <section className="student-self-profile__state student-self-profile__state--error">
+            <span>
+              <CircleAlert size={24} />
             </span>
-            <span className="profile-badge subtle">{student.course || "Course pending"}</span>
-          </div>
-        </div>
 
-        <div className="profile-card">
-          <div className="profile-left">
-            <div className="avatar-card">
-              <div className="avatar-preview">
-                {previewUrl || student.avatar ? (
-                  <img src={previewUrl || student.avatar || ""} alt={`${student.firstName} ${student.lastName} profile`} />
-                ) : (
-                  <div className="avatar-placeholder">
-                    <UserRound size={36} />
-                    <span>No Photo</span>
-                  </div>
-                )}
-              </div>
+            <div>
+              <strong>Student profile could not be loaded</strong>
+              <p>{error}</p>
+            </div>
 
-              <div className="avatar-actions">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/webp"
-                  onChange={handlePhotoSelection}
-                  style={{ display: "none" }}
-                />
-                <button type="button" className="btn small" onClick={() => fileInputRef.current?.click()} disabled={isUploading || isDeleting}>
-                  {isUploading ? (
-                    <>
-                      <LoaderCircle size={14} className="button-spinner" /> Uploading...
-                    </>
+            <button
+              type="button"
+              onClick={() => setRefreshKey((current) => current + 1)}
+            >
+              Try Again
+            </button>
+          </section>
+        )}
+
+        {!loading && !error && profile && (
+          <>
+            <section className="student-self-profile__identity">
+              <div className="student-self-profile__identity-main">
+                <div className="student-self-profile__photo">
+                  {photoUrl && !photoFailed ? (
+                    <img
+                      src={photoUrl}
+                      alt={`${profile.full_name} profile`}
+                      onError={() => setPhotoFailed(true)}
+                    />
                   ) : (
-                    <>
-                      <Camera size={14} /> Upload Photo
-                    </>
+                    <span>{getInitials(profile.full_name)}</span>
                   )}
-                </button>
-                {student.avatar ? (
-                  <button type="button" className="btn small danger" onClick={removePhoto} disabled={isUploading || isDeleting}>
-                    {isDeleting ? (
-                      <>
-                        <LoaderCircle size={14} className="button-spinner" /> Deleting...
-                      </>
-                    ) : (
-                      <>
-                        <Trash2 size={14} /> Remove Photo
-                      </>
-                    )}
-                  </button>
-                ) : null}
+                </div>
+
+                <div className="student-self-profile__identity-copy">
+                  <span className="student-self-profile__identity-label">
+                    Student
+                  </span>
+
+                  <h2>{formatValue(profile.full_name)}</h2>
+
+                  <div className="student-self-profile__identity-meta">
+                    <span>{formatValue(profile.student_number)}</span>
+                    <span aria-hidden="true">•</span>
+                    <span>{formatValue(profile.course.course_code)}</span>
+                    <span aria-hidden="true">•</span>
+                    <span>{formatYearLevel(profile.year_level)}</span>
+                  </div>
+
+                  <p>{courseLabel || "Program information not provided"}</p>
+                </div>
               </div>
 
-              {selectedPhoto && !isUploading ? (
-                <div className="avatar-preview-actions">
-                  <button type="button" className="btn primary small" onClick={uploadPhoto}>
-                    Save Photo
-                  </button>
-                  <button type="button" className="btn small" onClick={() => setSelectedPhoto(null)}>
-                    Cancel
-                  </button>
+              <div className="student-self-profile__identity-details">
+                <div>
+                  <span>Section</span>
+                  <strong>{formatValue(profile.section.section_name)}</strong>
                 </div>
-              ) : null}
 
-              {feedback ? <div className={`avatar-feedback ${feedback.type}`}>{feedback.message}</div> : null}
-
-              <div className="avatar-meta">
-                <div className="meta-row">
-                  <strong>
-                    {student.firstName} {student.lastName}
+                <div>
+                  <span>Enrollment Status</span>
+                  <strong
+                    className={`student-self-profile__status student-self-profile__status--${getStatusClass(
+                      enrollmentStatus,
+                    )}`}
+                  >
+                    <i />
+                    {enrollmentStatus}
                   </strong>
                 </div>
-                <div className="meta-row muted">Student</div>
               </div>
-            </div>
+            </section>
 
-            <div className="profile-summary">
-              <h3>Account Overview</h3>
-              <div className="summary-item">
-                <span>Student No.</span>
-                <strong>{student.studentNumber || "â€”"}</strong>
-              </div>
-              <div className="summary-item">
-                <span>Course</span>
-                <strong>{student.course || "â€”"}</strong>
-              </div>
-              <div className="summary-item">
-                <span>Year Level</span>
-                <strong>{student.yearLevel || "â€”"}</strong>
-              </div>
-              <div className="summary-item">
-                <span>Section</span>
-                <strong>{student.section || "â€”"}</strong>
-              </div>
-            </div>
-          </div>
+            <section className="student-self-profile__content-grid">
+              <article className="student-self-profile__card">
+                <header className="student-self-profile__card-header">
+                  <span className="student-self-profile__card-icon">
+                    <UserRound size={18} />
+                  </span>
 
-          <div className="profile-right">
-            <div className="profile-form">
-              <div className="section-header">
-                <h2>Personal Information</h2>
-                <small>These details are displayed for reference and remain part of your official student record.</small>
-              </div>
+                  <div>
+                    <span>Student Details</span>
+                    <h2>Personal Information</h2>
+                    <p>Your personal information recorded by the college.</p>
+                  </div>
+                </header>
 
-              <div className="info-grid">
-                <div className="info-card">
-                  <span className="info-label">Student ID</span>
-                  <strong>{student.studentNumber || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Full Name</span>
-                  <strong>
-                    {[student.firstName, student.middleName, student.lastName].filter(Boolean).join(" ") || "Not provided"}
-                  </strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Email</span>
-                  <strong>{student.email || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Phone Number</span>
-                  <strong>{student.contactNumber || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Gender</span>
-                  <strong>{student.gender || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Birth Date</span>
-                  <strong>
-                   {student.birthDate
-                    ? new Date(student.birthDate).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })
-                    : "Not provided"}
-                  </strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Address</span>
-                  <strong>{student.address || "Not provided"}</strong>
-                </div>
-              </div>
+                <div className="student-self-profile__fields">
+                  <div className="student-self-profile__field student-self-profile__field--wide">
+                    <span className="student-self-profile__field-icon">
+                      <UserRound size={15} />
+                    </span>
+                    <div>
+                      <span>Full Name</span>
+                      <strong>{formatValue(profile.full_name)}</strong>
+                    </div>
+                  </div>
 
-              <div className="section-header">
-                <h2>Academic Information</h2>
-                <small>Enrollment details are maintained as part of the student record.</small>
-              </div>
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <IdCard size={15} />
+                    </span>
+                    <div>
+                      <span>Student Number</span>
+                      <strong>{formatValue(profile.student_number)}</strong>
+                    </div>
+                  </div>
 
-              <div className="info-grid">
-                <div className="info-card">
-                  <span className="info-label">Course</span>
-                  <strong>{student.course || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Year Level</span>
-                  <strong>{student.yearLevel || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Section</span>
-                  <strong>{student.section || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Enrollment Status</span>
-                  <strong>{student.enrollmentStatus || "Not provided"}</strong>
-                </div>
-              </div>
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <Mail size={15} />
+                    </span>
+                    <div>
+                      <span>Email Address</span>
+                      <strong>{formatValue(profile.email)}</strong>
+                    </div>
+                  </div>
 
-              <div className="section-header">
-                <h2>Guardian Information</h2>
-                <small>Emergency and family contact details are stored separately for privacy and clarity.</small>
-              </div>
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <Phone size={15} />
+                    </span>
+                    <div>
+                      <span>Contact Number</span>
+                      <strong>{formatValue(profile.contact_number)}</strong>
+                    </div>
+                  </div>
 
-              <div className="info-grid">
-                <div className="info-card">
-                  <span className="info-label">Guardian Name</span>
-                  <strong>{student.guardianName || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Guardian Relationship</span>
-                  <strong>{student.guardianRelationship || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Guardian Contact</span>
-                  <strong>{student.guardianContact || "Not provided"}</strong>
-                </div>
-              </div>
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <UserRound size={15} />
+                    </span>
+                    <div>
+                      <span>Gender</span>
+                      <strong>{formatValue(profile.gender)}</strong>
+                    </div>
+                  </div>
 
-              <div className="section-header">
-                <h2>Contact & Address Information</h2>
-                <small>These records are view-only and are maintained by the Administration Office.</small>
-              </div>
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <CalendarDays size={15} />
+                    </span>
+                    <div>
+                      <span>Date of Birth</span>
+                      <strong>{formatDate(profile.birth_date)}</strong>
+                    </div>
+                  </div>
 
-              <div className="info-grid">
-                <div className="info-card">
-                  <span className="info-label">Mobile Number</span>
-                  <strong>{student.contactNumber || "Not provided"}</strong>
+                  <div className="student-self-profile__field student-self-profile__field--wide">
+                    <span className="student-self-profile__field-icon">
+                      <MapPin size={15} />
+                    </span>
+                    <div>
+                      <span>Address</span>
+                      <strong>{formatValue(profile.address)}</strong>
+                    </div>
+                  </div>
                 </div>
-                <div className="info-card">
-                  <span className="info-label">Email Address</span>
-                  <strong>{student.email || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">House No.</span>
-                  <strong>{student.houseNo || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Street</span>
-                  <strong>{student.street || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Barangay</span>
-                  <strong>{student.barangay || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">City</span>
-                  <strong>{student.city || "Not provided"}</strong>
-                </div>
-                <div className="info-card">
-                  <span className="info-label">Province</span>
-                  <strong>{student.province || "Not provided"}</strong>
-                </div>
-              </div>
+              </article>
 
-              <div className="section-header">
-                <h2>Student Status</h2>
-                <small>Only the Administrator can manage this official school record.</small>
-              </div>
+              <article className="student-self-profile__card">
+                <header className="student-self-profile__card-header">
+                  <span className="student-self-profile__card-icon">
+                    <GraduationCap size={18} />
+                  </span>
 
-              <div className="status-card">
-                <span className={getStatusClass(student.studentStatus)}>{student.studentStatus || "Active"}</span>
-                <p className="status-help">This status is read-only and cannot be changed from this page.</p>
-              </div>
+                  <div>
+                    <span>Current Standing</span>
+                    <h2>Academic Information</h2>
+                    <p>Your current program and enrollment information.</p>
+                  </div>
+                </header>
 
-              <div className="official-note">
-                <p>
-                  Your personal information, contact details, address, and student status are official school records maintained by the Administration Office. Students cannot edit these records. If any information is incorrect, please contact the administrator. Only your profile picture can be updated from this page.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                <div className="student-self-profile__fields">
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <IdCard size={15} />
+                    </span>
+                    <div>
+                      <span>Student Number</span>
+                      <strong>{formatValue(profile.student_number)}</strong>
+                    </div>
+                  </div>
+
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <BookOpen size={15} />
+                    </span>
+                    <div>
+                      <span>Course / Program</span>
+                      <strong>{courseLabel || "Not provided"}</strong>
+                    </div>
+                  </div>
+
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <GraduationCap size={15} />
+                    </span>
+                    <div>
+                      <span>Year Level</span>
+                      <strong>{formatYearLevel(profile.year_level)}</strong>
+                    </div>
+                  </div>
+
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <Home size={15} />
+                    </span>
+                    <div>
+                      <span>Section</span>
+                      <strong>
+                        {formatValue(profile.section.section_name)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <CalendarDays size={15} />
+                    </span>
+                    <div>
+                      <span>Academic Year</span>
+                      <strong>
+                        {formatValue(profile.academic_year.academic_year)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="student-self-profile__field">
+                    <span className="student-self-profile__field-icon">
+                      <CalendarDays size={15} />
+                    </span>
+                    <div>
+                      <span>Semester</span>
+                      <strong>
+                        {formatValue(profile.semester.semester_name)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="student-self-profile__field student-self-profile__field--wide">
+                    <span className="student-self-profile__field-icon">
+                      <ShieldCheck size={15} />
+                    </span>
+                    <div>
+                      <span>Enrollment Status</span>
+                      <strong
+                        className={`student-self-profile__inline-status student-self-profile__inline-status--${getStatusClass(
+                          enrollmentStatus,
+                        )}`}
+                      >
+                        <i />
+                        {enrollmentStatus}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article className="student-self-profile__card student-self-profile__card--guardian">
+                <header className="student-self-profile__card-header">
+                  <span className="student-self-profile__card-icon">
+                    <UsersRound size={18} />
+                  </span>
+
+                  <div>
+                    <span>Emergency Contact</span>
+                    <h2>Guardian Information</h2>
+                    <p>Guardian details currently recorded for your account.</p>
+                  </div>
+                </header>
+
+                <div className="student-self-profile__guardian-grid">
+                  <div>
+                    <span>Guardian Name</span>
+                    <strong>
+                      {formatValue(profile.guardian?.guardian_name)}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Relationship</span>
+                    <strong>
+                      {formatValue(profile.guardian?.relationship)}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Contact Number</span>
+                    <strong>
+                      {formatValue(profile.guardian?.contact_number)}
+                    </strong>
+                  </div>
+                </div>
+              </article>
+            </section>
+          </>
+        )}
+      </main>
     </DashboardLayout>
   );
 }
-
